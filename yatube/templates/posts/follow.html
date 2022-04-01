@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block title %}
+  Подписки
+{% endblock %}
+{% block content %}
+  <div class="container py-5">
+    <h1>Подписки</h1>
+    {% include 'includes/switcher.html' %}
+    {% include 'includes/post_list.html' %}
+    {% include 'includes/paginator.html' %}
+  </div>
+{% endblock %}

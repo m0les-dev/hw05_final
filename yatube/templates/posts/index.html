@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load cache %}
+{% block title %}Последние изменения на сайте {% endblock %}
+{% block header %}Последние обновления на сайте{% endblock %}
+{% block content %}
+<h1>Последние изменения на сайте</h1>
+{% cache 20 index_page %}
+{% for post in page_obj  %}
+<article>
+  {% include 'posts/includes/post_body.html' %}
+  {% if post.group %}
+  <a class="btn btn-outline-primary" href="{% url 'posts:posts' post.group.slug %}">Все записи группы</a>
+  {% endif %}
+</article>
+{% if not forloop.last %}
+<hr />
+{% endif %}
+{% endfor %}
+{% include 'posts/includes/paginator.html' %}
+{% endcache %}
+{% endblock %}

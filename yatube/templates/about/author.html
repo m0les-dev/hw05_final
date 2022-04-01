@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" />
+<div class="container">
+  <h1>Об авторе</h1>
+
+  <div class="row">
+    <aside class="col-md-3">
+      <div class="card"> 
+        <article class="p-4 p-xl-5 text-center"> 
+          <img src="{% static 'img/ava.jpg' %}" class="img-avatar img-md"> 
+          <h6 class="card-title mt-3">Обратная связь</h6> 
+          <p> Звонок +7 123456789 
+            <br> Email: author@yatube.ru </p> 
+            <br>
+        </article> 
+      </div>
+    </aside>
+    <aside class="col-md-9">
+      <article class="card mb-4">
+        <div class="card-body">
+          <h4 class="card-title">Об авторе</h4>
+          <p>
+            Привет! Меня зовут Олеся и я автор этого сайта, который я создала во время обучения в Яндекс.Практикуме. </p>
+            <p> Несмотря на то, что я учусь в 10 классе общеобразовательной школы, у меня уже есть свое портфолио, с которым можно ознакомиться на Github.</p>
+            <a href="https://github.com/m0les-dev" class="btn btn-lg btn-outline-primary" target="_blank">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+            </svg> 
+            Портфолио </a>
+            <hr>
+            
+            <p>Программированием я увлеклась относительно недавно. Но, чем больше я этим занимаюсь, тем больше мне нравится эта профессия.</p>
+            <img src="{% static 'img/img.jpg' %}" class="img-thumbnail rounded ">
+          <p>Этот проект я создавала за этим столом <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-emoji-smile" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+          </svg>.</p>
+            
+            <p>Более подробно узнать обо мне можно здесь.
+          </p>
+          <nav class="mt-3"> 
+            <a class="btn btn-icon btn-light" target="_blank" href="#"><i class="fab fa-vk"></i></a> 
+            <a class="btn btn-icon btn-light" target="_blank" href="#"><i class="fab fa-instagram"></i></a> 
+            <a class="btn btn-icon btn-light" target="_blank" href="#"><i class="fab fa-youtube"></i></a> 
+            <a class="btn btn-icon btn-light" target="_blank" href="#"><i class="fab fa-whatsapp"></i></a>
+            <a class="btn btn-icon btn-light" target="_blank" href="#"><i class="fab fa-telegram"></i></a>
+            <a class="btn btn-icon btn-light" target="_blank" href="#"><i class="fab fa-slack"></i></a>  
+          </nav>
+         
+        </div>
+      </article>
+    </aside>
+
+
+  </div>
+</div>
+
+{% endblock %}

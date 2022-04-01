@@ -1,0 +1,17 @@
+{% extends "posts/index.html" %}
+{% block title %}Профайл пользователя {{ author_name }}{% endblock %}
+{% block content %}
+<h1>Все посты пользователя {{ author_name }}</h1>
+<h3>Всего постов: {{ author.posts.count }} </h3>
+
+<p> {{ group.description }}</p>
+{% for post in page_obj %}
+<article>
+  {% include 'posts/includes/post_body.html' %}
+</article>
+{% if not forloop.last %}
+<hr />
+{% endif %}
+{% endfor %}
+{% include 'posts/includes/paginator.html' %}
+{% endblock %}
