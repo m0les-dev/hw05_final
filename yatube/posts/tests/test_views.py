@@ -153,7 +153,7 @@ class PostPagesTests(TestCase):
         """Новый пост попал в профиль."""
         response = self.authorized_client.get(reverse(self.PROFILE,
                                                       args=[USERNAME]))
-        posts = response.context['author']
+        posts = response.context['author'].username
         self.assertIn(self.post, posts)
 
     def test_post_not_in_your_group(self):
