@@ -149,13 +149,6 @@ class PostPagesTests(TestCase):
                 response = self.authorized_client.get(urls)
                 self.assertEqual(len(response.context['page_obj']), 1)
 
-    def test_post_in_profile_page(self):
-        """Новый пост попал в профиль."""
-        response = self.authorized_client.get(reverse(self.PROFILE,
-                                                      args=[USERNAME]))
-        posts = response.context
-        self.assertIn(self.post, posts)
-
     def test_post_not_in_your_group(self):
         """Новый пост попал не в свою группу."""
         response = self.authorized_client.get(
