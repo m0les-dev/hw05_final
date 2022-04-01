@@ -12,7 +12,7 @@ from posts.models import Group, Post, User, Comment
 
 USERNAME = 'test-username'
 INDEX = 'posts:index'
-GROUP_LIST = 'posts:group_list'
+GROUP_LIST = 'posts:posts'
 POST_CREATE = 'posts:post_create'
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
