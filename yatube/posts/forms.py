@@ -27,6 +27,7 @@ class PostForm(forms.ModelForm):
             raise forms.ValidationError('Поле не может быть пустым')
         return data
 
+
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

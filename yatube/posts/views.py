@@ -9,6 +9,7 @@ from .models import Group, Post, User, Follow
 
 POSTS_PER_PAGE = 10
 
+
 @cache_page(20, key_prefix='index_page')
 def index(request):
     post_list = Post.objects.all()
