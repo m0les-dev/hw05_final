@@ -15,6 +15,7 @@ INDEX = 'posts:index'
 GROUP_LIST = 'posts:posts'
 POST_CREATE = 'posts:post_create'
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+POSTS_PER_PAGE = 10
 
 
 class PostPagesTests(TestCase):
@@ -229,7 +230,7 @@ class TestPaginator(TestCase):
             with self.subTest(url=url):
                 response = self.authorized_client.get(url)
                 self.assertEqual(len(response.context['page_obj']),
-                                 settings.NUM_OF_POSTS)
+                                 POSTS_PER_PAGE)
 
     def test_second_page_paginator(self):
         """Правильная работа паджинатора на второй странице."""
