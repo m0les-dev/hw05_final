@@ -171,7 +171,7 @@ def test_profile_follow(self):
     follow_count = Follow.objects.filter(
         user=PostPagesTests.another_user).count()
     self.another_authorized_client.get(
-        reverse('profile_follow',
+        reverse('posts:profile_follow',
                 kwargs={'username': USERNAME_B}
                 ))
     self.assertEqual(Follow.objects.filter(
@@ -184,7 +184,7 @@ def test_profile_unfollow(self):
     follow_count = Follow.objects.filter(
         user=PostPagesTests.user).count()
     self.authorized_client.get(
-        reverse('profile_unfollow',
+        reverse('posts:profile_unfollow',
                 kwargs={'username': USERNAME_B}
                 ))
     self.assertEqual(Follow.objects.filter(
@@ -200,11 +200,11 @@ def test_follow_index(self):
         text='Другой текст поста',
         author=PostPagesTests.another_user)
     response = self.authorized_client.get(
-        reverse('follow_index'))
+        reverse('posts:follow_index'))
     self.assertEqual(
         len(response.context['page']), EXIST)
     response = self.another_authorized_client.get(
-        reverse('follow_index'))
+        reverse('posts:follow_index'))
     self.assertEqual(
         len(response.context['page']), NOT_EXIST)
 
