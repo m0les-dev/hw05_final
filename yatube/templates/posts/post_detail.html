@@ -1,8 +1,6 @@
 {% extends "posts/index.html" %}
 {% load thumbnail %}
-{% block title %}
-{{ post.text|truncatechars:30 }}
-{% endblock %}
+{% block title %}{{ post.text|truncatechars:30 }} {% endblock %}
 {% block content %}
 <div class="row">
   <aside class="col-12 col-md-3 mt-3 card">
@@ -49,7 +47,8 @@
       </a>
       {% endif %}
     </div>
-    {% include 'includes/comment.html' with comments=post.comments.all form_comment=form_comment post=post %}
+    {% include 'posts/includes/comment.html' with comments=post.comments.all
+    form_comment=form_comment post=post %}
   </article>
 </div>
 {% endblock %}

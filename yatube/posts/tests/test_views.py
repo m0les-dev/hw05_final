@@ -8,14 +8,26 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.models import Group, Post, User, Comment
+from posts.models import Group, Post, User, Comment, Follow
 
 USERNAME = 'test-username'
+USERNAME_B = 'yet-another-username'
 INDEX = 'posts:index'
 GROUP_LIST = 'posts:posts'
 POST_CREATE = 'posts:post_create'
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 POSTS_PER_PAGE = 10
+THIRD_PAGE = 3
+EXIST = 1
+NOT_EXIST = 0
+SMALL_GIF = (
+    b'\x47\x49\x46\x38\x39\x61\x02\x00'
+    b'\x01\x00\x80\x00\x00\x00\x00\x00'
+    b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+    b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+    b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+    b'\x0A\x00\x3B'
+)
 
 
 class PostPagesTests(TestCase):
@@ -23,18 +35,13 @@ class PostPagesTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username=USERNAME)
+        cls.another_user = User.objects.create_user(
+            username=USERNAME_B)
         cls.group = Group.objects.create(
             title='test-group',
             slug='test-slug',
         )
-        small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
+        small_gif = SMALL_GIF
         uploaded = SimpleUploadedFile(
             name='small.gif',
             content=small_gif,
@@ -157,6 +164,70 @@ class PostPagesTests(TestCase):
                 kwargs={'slug': self.group.slug},))
         self.assertNotEqual(response.context.get('page_obj'), self.post)
 
+
+def test_profile_follow(self):
+    """Подписка на автора (делаем запрос, смотрим что создался правильный объект Follow)"""
+    follow_count = Follow.objects.filter(
+        user=PostPagesTests.another_user).count()
+    self.another_authorized_client.get(
+        reverse('profile_follow',
+                kwargs={'username': USERNAME_B}
+                ))
+    self.assertEqual(Follow.objects.filter(
+        user=PostPagesTests.another_user).count(), follow_count + EXIST)
+
+
+def test_profile_unfollow(self):
+    """Отписка от автора (создаем объект Follow, делаем запрос, смотрим что объект удалился)"""
+    follow_count = Follow.objects.filter(
+        user=PostPagesTests.user).count()
+    self.authorized_client.get(
+        reverse('profile_unfollow',
+                kwargs={'username': USERNAME_B}
+                ))
+    self.assertEqual(Follow.objects.filter(
+        user=PostPagesTests.user).count(), follow_count - EXIST)
+
+
+def test_follow_index(self):
+    """Проверяем, что при подписке пост автора появляется в ленте пользователя 
+    и что при подписке одного юзера пост автора не появляется в ленте другого. """
+    Post.objects.create(
+        text='Другой текст поста',
+        author=PostPagesTests.another_user)
+    response = self.authorized_client.get(
+        reverse('follow_index'))
+    self.assertEqual(
+        len(response.context['page']), EXIST)
+    response = self.another_authorized_client.get(
+        reverse('follow_index'))
+    self.assertEqual(
+        len(response.context['page']), NOT_EXIST)
+
+
+class TestComments(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create(username=USERNAME)
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test-slug',
+            description='Тестовое описание',
+        )
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовый пост',
+            group=cls.group,
+        )
+
+    def setUp(self):
+        self.user_not_authorized = User.objects.create(username='NoName')
+        self.user_authorized = User.objects.create(username=USERNAME)
+        self.not_authorized_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user_authorized)
+
     def test_authorized_client_allowed_to_add_comment(self):
         '''Авторизованный пользователь может оставлять комментарий.'''
         comment_quantity = Comment.objects.count()
@@ -169,7 +240,7 @@ class PostPagesTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertEqual(Comment.objects.count(), comment_quantity + 1)
+        self.assertEqual(Comment.objects.count(), comment_quantity + EXIST)
 
     def test_guest_client_not_allowed_to_add_comment(self):
         '''Неавторизованный пользователь не может оставлять комментарий.'''
@@ -180,7 +251,44 @@ class PostPagesTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertNotEqual(Comment.objects.count(), comment_quantity + 1)
+        self.assertNotEqual(Comment.objects.count(), comment_quantity + EXIST)
+
+
+class TestCache(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username=USERNAME)
+        cls.another_user = User.objects.create_user(
+            username=USERNAME_B)
+        cls.group = Group.objects.create(
+            title='test-group',
+            slug='test-slug',
+        )
+        small_gif = SMALL_GIF
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=small_gif,
+            content_type='image/gif'
+        )
+        cls.post = Post.objects.create(
+            text='Тестовый текст',
+            author=cls.user,
+            group=cls.group,
+            image=uploaded
+        )
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user)
+
+        cls.PROFILE = 'posts:profile'
+        cls.POST_DETAIL = 'posts:post_detail'
+        cls.POST_EDIT = 'posts:post_edit'
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        cache.clear()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def test_cache(self):
         url = reverse(INDEX)
@@ -236,4 +344,4 @@ class TestPaginator(TestCase):
         for url in urls:
             with self.subTest(url=url):
                 response = self.authorized_client.get(url)
-                self.assertEqual(len(response.context['page_obj']), 3)
+                self.assertEqual(len(response.context['page_obj']), THIRD_PAGE)

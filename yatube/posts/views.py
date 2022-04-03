@@ -9,13 +9,17 @@ from .models import Group, Post, User, Follow
 
 POSTS_PER_PAGE = 10
 
+def paginator(request, queryset):
+    posts_per_page = Paginator(queryset, POSTS_PER_PAGE)
+    page_number = request.GET.get('page')
+    page_obj = posts_per_page.get_page(page_number)
+    return page_obj
+
 
 @cache_page(20, key_prefix='index_page')
 def index(request):
-    post_list = Post.objects.all()
-    paginator = Paginator(post_list, POSTS_PER_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    post_list = Post.objects.select_related('author').all()   
+    page_obj = paginator(request, post_list)
     context = {
         'page_obj': page_obj,
     }
@@ -25,10 +29,8 @@ def index(request):
 def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
-    post_list = group.posts.all()
-    paginator = Paginator(post_list, POSTS_PER_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    post_list = group.posts.all()    
+    page_obj = paginator(request, post_list)
     context = {
         'group': group,
         'page_obj': page_obj,
@@ -37,14 +39,10 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    user = get_object_or_404(User, username=username)
-    count = Post.objects.select_related('author').count()
+    user = get_object_or_404(User, username=username)    
     post_list = user.posts.all()
-    paginator = Paginator(post_list, POSTS_PER_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        'count': count,
+    page_obj = paginator(request, post_list)
+    context = {        
         'page_obj': page_obj,
         'author_name': user,
     }
@@ -53,13 +51,9 @@ def profile(request, username):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    author = post.author
-    pub_date = post.pub_date
     form = CommentForm(instance=None)
     context = {
         'post': post,
-        'author': author,
-        'pub_date': pub_date,
         'form': form,
     }
     return render(request, 'posts/post_detail.html', context)
@@ -67,14 +61,13 @@ def post_detail(request, post_id):
 
 @login_required
 def post_create(request):
-    template = 'posts/create_post.html'
     form = PostForm(request.POST)
     if form.is_valid():
         post = form.save(commit=False)
         post.author = request.user
         post.save()
         return redirect('posts:profile', request.user.username)
-    return render(request, template, {'form': form})
+    return render(request, 'posts/create_post.html', {'form': form})
 
 
 @login_required
@@ -113,28 +106,21 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    post_list = Post.objects.filter(author__following__user=request.user)
-    paginator = Paginator(post_list, POSTS_PER_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    post_list = Post.objects.filter(author__following__user=request.user)    
+    page_obj = paginator(request, post_list)
     context = {
-        'page_obj': page_obj,
-        'paginator': paginator}
+        'page_obj': page_obj,}
     return render(request, 'posts/follow.html', context)
 
 
 @login_required
 def profile_follow(request, username):
-    follower = get_object_or_404(User, username=request.user.username)
     author = get_object_or_404(User, username=username)
-    if author == follower:
-        return redirect('posts:profile', username=author.username)
-    if follower.follower.filter(author=author).exists():
-        return redirect('posts:profile', username=author.username)
-    follow = Follow.objects.create(user=follower, author=author)
-    follow.save()
-    return redirect('posts:profile', username=username)
-
+    if author != request.user:
+        Follow.objects.get_or_create(
+            user=request.user,
+            author=author)
+    return redirect("posts:profile", username=username)
 
 @login_required
 def profile_unfollow(request, username):
