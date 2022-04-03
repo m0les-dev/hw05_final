@@ -180,7 +180,7 @@ class PostPagesTests(TestCase):
                     kwargs={'username': USERNAME_B}
                     ))
         self.assertEqual(Follow.objects.filter(
-            user=PostPagesTests.another_user).count(), follow_count + EXIST)
+            user=USERNAME_B).count(), follow_count + EXIST)
 
     def test_profile_unfollow(self):
         """Отписка от автора (создаем объект Follow, делаем запрос,
