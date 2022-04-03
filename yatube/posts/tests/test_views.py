@@ -230,7 +230,7 @@ class TestComments(TestCase):
 
     def setUp(self):
         self.user_not_authorized = User.objects.create(username='NoName')
-        self.user_authorized = User.objects.create(username=USERNAME)
+        self.user_authorized = User.objects.create(username='Leo')
         self.not_authorized_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user_authorized)
