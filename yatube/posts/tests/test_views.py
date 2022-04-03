@@ -59,6 +59,8 @@ class PostPagesTests(TestCase):
         cls.PROFILE = 'posts:profile'
         cls.POST_DETAIL = 'posts:post_detail'
         cls.POST_EDIT = 'posts:post_edit'
+        Follow.objects.create(user=PostPagesTests.user,
+                              author=PostPagesTests.another_user)
 
     @classmethod
     def tearDownClass(cls):
