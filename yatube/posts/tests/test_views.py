@@ -199,11 +199,11 @@ class PostPagesTests(TestCase):
         response = self.authorized_client.get(
             reverse('posts:follow_index'))
         self.assertEqual(
-            len(response.context['post']), EXIST)
+            len(response.context['page']), EXIST)
         response = self.another_authorized_client.get(
             reverse('posts:follow_index'))
         self.assertEqual(
-            len(response.context['post']), NOT_EXIST)
+            len(response.context['page']), NOT_EXIST)
 
 
 class TestComments(TestCase):
