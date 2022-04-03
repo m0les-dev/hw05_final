@@ -9,6 +9,7 @@ from .models import Group, Post, User, Follow
 
 POSTS_PER_PAGE = 10
 
+
 def paginator(request, queryset):
     posts_per_page = Paginator(queryset, POSTS_PER_PAGE)
     page_number = request.GET.get('page')
@@ -18,7 +19,7 @@ def paginator(request, queryset):
 
 @cache_page(20, key_prefix='index_page')
 def index(request):
-    post_list = Post.objects.select_related('author').all()   
+    post_list = Post.objects.select_related('author').all()
     page_obj = paginator(request, post_list)
     context = {
         'page_obj': page_obj,
@@ -29,7 +30,7 @@ def index(request):
 def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
-    post_list = group.posts.all()    
+    post_list = group.posts.all()
     page_obj = paginator(request, post_list)
     context = {
         'group': group,
@@ -39,10 +40,10 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    user = get_object_or_404(User, username=username)    
+    user = get_object_or_404(User, username=username)
     post_list = user.posts.all()
     page_obj = paginator(request, post_list)
-    context = {        
+    context = {
         'page_obj': page_obj,
         'author_name': user,
     }
@@ -106,10 +107,10 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    post_list = Post.objects.filter(author__following__user=request.user)    
+    post_list = Post.objects.filter(author__following__user=request.user)
     page_obj = paginator(request, post_list)
     context = {
-        'page_obj': page_obj,}
+        'page_obj': page_obj, }
     return render(request, 'posts/follow.html', context)
 
 
@@ -121,6 +122,7 @@ def profile_follow(request, username):
             user=request.user,
             author=author)
     return redirect("posts:profile", username=username)
+
 
 @login_required
 def profile_unfollow(request, username):

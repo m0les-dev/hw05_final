@@ -166,7 +166,8 @@ class PostPagesTests(TestCase):
 
 
 def test_profile_follow(self):
-    """Подписка на автора (делаем запрос, смотрим что создался правильный объект Follow)"""
+    """Подписка на автора (делаем запрос, смотрим что создался 
+    правильный объект Follow)"""
     follow_count = Follow.objects.filter(
         user=PostPagesTests.another_user).count()
     self.another_authorized_client.get(
@@ -178,7 +179,8 @@ def test_profile_follow(self):
 
 
 def test_profile_unfollow(self):
-    """Отписка от автора (создаем объект Follow, делаем запрос, смотрим что объект удалился)"""
+    """Отписка от автора (создаем объект Follow, делаем запрос,
+     смотрим что объект удалился)"""
     follow_count = Follow.objects.filter(
         user=PostPagesTests.user).count()
     self.authorized_client.get(
@@ -190,8 +192,10 @@ def test_profile_unfollow(self):
 
 
 def test_follow_index(self):
-    """Проверяем, что при подписке пост автора появляется в ленте пользователя 
-    и что при подписке одного юзера пост автора не появляется в ленте другого. """
+    """Проверяем, что при подписке пост автора появляется 
+    в ленте пользователя 
+    и что при подписке одного юзера пост автора 
+    не появляется в ленте другого. """
     Post.objects.create(
         text='Другой текст поста',
         author=PostPagesTests.another_user)
