@@ -164,49 +164,46 @@ class PostPagesTests(TestCase):
                 kwargs={'slug': self.group.slug},))
         self.assertNotEqual(response.context.get('page_obj'), self.post)
 
+    def test_profile_follow(self):
+        """Подписка на автора (делаем запрос, смотрим что создался
+        правильный объект Follow)"""
+        follow_count = Follow.objects.filter(
+            user=PostPagesTests.another_user).count()
+        self.another_authorized_client.get(
+            reverse('posts:profile_follow',
+                    kwargs={'username': USERNAME_B}
+                    ))
+        self.assertEqual(Follow.objects.filter(
+            user=PostPagesTests.another_user).count(), follow_count + EXIST)
 
-def test_profile_follow(self):
-    """Подписка на автора (делаем запрос, смотрим что создался
-    правильный объект Follow)"""
-    follow_count = Follow.objects.filter(
-        user=PostPagesTests.another_user).count()
-    self.another_authorized_client.get(
-        reverse('posts:profile_follow',
-                kwargs={'username': USERNAME_B}
-                ))
-    self.assertEqual(Follow.objects.filter(
-        user=PostPagesTests.another_user).count(), follow_count + EXIST)
+    def test_profile_unfollow(self):
+        """Отписка от автора (создаем объект Follow, делаем запрос,
+        смотрим что объект удалился)"""
+        follow_count = Follow.objects.filter(
+            user=PostPagesTests.user).count()
+        self.authorized_client.get(
+            reverse('posts:profile_unfollow',
+                    kwargs={'username': USERNAME_B}
+                    ))
+        self.assertEqual(Follow.objects.filter(
+            user=PostPagesTests.user).count(), follow_count - EXIST)
 
-
-def test_profile_unfollow(self):
-    """Отписка от автора (создаем объект Follow, делаем запрос,
-     смотрим что объект удалился)"""
-    follow_count = Follow.objects.filter(
-        user=PostPagesTests.user).count()
-    self.authorized_client.get(
-        reverse('posts:profile_unfollow',
-                kwargs={'username': USERNAME_B}
-                ))
-    self.assertEqual(Follow.objects.filter(
-        user=PostPagesTests.user).count(), follow_count - EXIST)
-
-
-def test_follow_index(self):
-    """Проверяем, что при подписке пост автора появляется
-    в ленте пользователя
-    и что при подписке одного юзера пост автора
-    не появляется в ленте другого. """
-    Post.objects.create(
-        text='Другой текст поста',
-        author=PostPagesTests.another_user)
-    response = self.authorized_client.get(
-        reverse('posts:follow_index'))
-    self.assertEqual(
-        len(response.context['page']), EXIST)
-    response = self.another_authorized_client.get(
-        reverse('posts:follow_index'))
-    self.assertEqual(
-        len(response.context['page']), NOT_EXIST)
+    def test_follow_index(self):
+        """Проверяем, что при подписке пост автора появляется
+        в ленте пользователя
+        и что при подписке одного юзера пост автора
+        не появляется в ленте другого. """
+        Post.objects.create(
+            text='Другой текст поста',
+            author=PostPagesTests.another_user)
+        response = self.authorized_client.get(
+            reverse('posts:follow_index'))
+        self.assertEqual(
+            len(response.context['page']), EXIST)
+        response = self.another_authorized_client.get(
+            reverse('posts:follow_index'))
+        self.assertEqual(
+            len(response.context['page']), NOT_EXIST)
 
 
 class TestComments(TestCase):
