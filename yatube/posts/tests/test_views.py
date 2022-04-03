@@ -56,6 +56,10 @@ class PostPagesTests(TestCase):
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user)
 
+        cls.another_authorized_client = Client()
+        cls.another_authorized_client.force_login(
+            cls.another_user)
+
         cls.PROFILE = 'posts:profile'
         cls.POST_DETAIL = 'posts:post_detail'
         cls.POST_EDIT = 'posts:post_edit'
